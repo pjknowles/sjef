@@ -398,7 +398,9 @@ TEST_F(test_sjef, many_projects) {
   projects.reserve(n_projects);
   for (int i = 0; i < n_projects; ++i)
     projects.emplace_back(new sjef::Project(
-        testfile(std::string{"many_projects_"} + std::to_string(i) + ".molpro"), true, "molpro", {}));
+//        testfile(std::string{"many_projects_"} + std::to_string(i) + ".molpro"), true, "molpro", {})
+        testproject("many_projects_"+std::to_string(i)))
+                          );
   const auto& backend = sjef::Backend::dummy_name;
   for (auto& p : projects)
     EXPECT_EQ(p->status(), sjef::status::unevaluated);
