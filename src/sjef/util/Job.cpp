@@ -150,10 +150,13 @@ std::string Job::run(const std::string& command, int verbosity, bool wait) {
 }
 
 void Job::set_status(status stat) {
+  std::cout << "set_status() "<<stat<<std::endl;
   const_cast<Project&>(m_project).property_set("_status", std::to_string(static_cast<int>(stat)));
+  std::cout << "set_status() "<<stat << m_project.status()<<std::endl;
 }
 
 status Job::get_status(int verbosity) {
+  std::cout << "get_status() "<<std::endl;
   if (m_job_number == 0)
     return unknown;
   auto status_string =

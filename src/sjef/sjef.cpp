@@ -243,11 +243,11 @@ Project::Project(const std::filesystem::path& filename, bool construct, const st
     // we may be loading an old project with an active job when it was last closed, so need to poll its status
     {
       auto initial_status = static_cast<sjef::status>(std::stoi("0" + property_get("_status")));
-      //      std::cout << "initial_status " << initial_status << std::endl;
+            std::cout << "initial_status " << initial_status << std::endl;
       if (initial_status == running or initial_status == waiting) {
         auto new_status = util::Job(*this).get_status();
         if (new_status == unknown) {
-          //          std::cout << "setting status from " << initial_status <<" to completed"<< std::endl;
+                    std::cout << "setting status from " << initial_status <<" to completed"<< std::endl;
           property_set("_status", std::to_string(static_cast<int>(completed)));
         }
       }
@@ -684,7 +684,9 @@ std::string Project::file_contents(const std::string& suffix, const std::string&
 }
 
 sjef::status Project::status() const {
+  std::cout << util::Shell()("cat "+filename("plist","Info").string())<<std::endl;
   auto current_status = property_get("_status");
+  std::cout << "status() "<<current_status<<std::endl;
   return current_status.empty() ? unevaluated : static_cast<sjef::status>(std::stoi(current_status));
 }
 
@@ -749,6 +751,7 @@ void Project::property_set(const mapstringstring_t& properties) {
   auto lock = m_locker->bolt();
   check_property_file_locked();
   for (const auto& [property, value] : properties) {
+    std::cout << "property_set "<<property<<" = "<<value<<std::endl;
     property_delete_locked(property);
     std::lock_guard guard(m_unmovables.m_property_set_mutex);
     if (!m_properties->child("plist"))
