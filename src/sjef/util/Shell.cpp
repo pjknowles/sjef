@@ -44,6 +44,7 @@ static std::string executable(const fs::path& command) {
 
 std::string Shell::operator()(const std::string& command, bool wait, const std::string& directory, int verbosity,
                               const std::string& out, const std::string& err) const {
+  verbosity=4;
   std::lock_guard lock(m_run_mutex);
   m_trace(2 - verbosity) << "Command::operator() " << command << std::endl;
   m_trace(2 - verbosity) << "Command::operator() m_host=" << m_host << ", wait=" << wait
@@ -134,7 +135,7 @@ void Shell::wait(int min_wait_milliseconds, int max_wait_milliseconds) const {
 }
 
 bool Shell::running() const {
-  if (localhost())
+  if (localhost() and m_job_number==0)
     return m_process.running();
   return (*this)(std::string{"ps -p "} + std::to_string(m_job_number) + " > /dev/null 2>/dev/null; echo $?") == "0";
 }

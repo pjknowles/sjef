@@ -684,9 +684,9 @@ std::string Project::file_contents(const std::string& suffix, const std::string&
 }
 
 sjef::status Project::status() const {
-  std::cout << util::Shell()("cat "+filename("plist","Info").string())<<std::endl;
+//  std::cout << util::Shell()("cat "+filename("plist","Info").string())<<std::endl;
   auto current_status = property_get("_status");
-  std::cout << "status() "<<current_status<<std::endl;
+//  std::cout << "status() "<<current_status<<std::endl;
   return current_status.empty() ? unevaluated : static_cast<sjef::status>(std::stoi(current_status));
 }
 
