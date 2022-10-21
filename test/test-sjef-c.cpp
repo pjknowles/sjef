@@ -71,7 +71,6 @@ TEST_F(test_sjef, c_binding) {
 }
 
 TEST(backend, C_keys) {
-  savestate state;
   auto allKeys = sjef_backend_keys();
   ASSERT_NE(allKeys, nullptr);
   size_t i;
