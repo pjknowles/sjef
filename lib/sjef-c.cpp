@@ -43,11 +43,11 @@ void sjef_project_close(const char* project) {
   } catch (...) {
   }
 }
-int sjef_project_copy(const char* project, const char* destination_filename, int keep_hash) {
+int sjef_project_copy(const char* project, const char* destination_filename, int keep_hash, int keep_run_directories) {
   try {
     if (projects.count(project) == 0)
       sjef_project_open(project);
-    return (projects.at(project)->copy(destination_filename, keep_hash != 0) ? 1 : 0);
+    return (projects.at(project)->copy(destination_filename, false, keep_hash != 0, false, keep_run_directories) ? 1 : 0);
   } catch (std::exception& e) {
     error(e);
   } catch (...) {
@@ -71,7 +71,8 @@ void sjef_project_erase(const char* project) {
   try {
     if (projects.count(project) != 0)
       sjef_project_close(project);
-    fs::remove_all(sjef::Project(project, false).filename());
+    const auto& path = sjef::Project(project, false).filename();
+    sjef::Project::erase(path);
   } catch (std::exception& e) {
     error(e);
   } catch (...) {
@@ -122,15 +123,6 @@ int sjef_project_run_needed(const char* project) {
 }
 
 int sjef_project_synchronize(const char* project, const char* backend, int verbosity) {
-  try {
-    if (projects.count(project) == 0)
-      sjef_project_open(project);
-    projects.at(project)->change_backend(backend);
-    return (projects.at(project)->synchronize(verbosity) ? 1 : 0);
-  } catch (std::exception& e) {
-    error(e);
-  } catch (...) {
-  }
   return 0;
 }
 int sjef_project_run(const char* project, const char* backend, int verbosity, int force, int wait) {
@@ -148,7 +140,7 @@ static int sjef_project_status_asynchronous(const char* project, int verbosity, 
   try {
     if (projects.count(project) == 0)
       sjef_project_open(project);
-    return static_cast<int>(projects.at(project)->status(verbosity, wait != 0));
+    return static_cast<int>(projects.at(project)->status());
   } catch (std::exception& e) {
     error(e);
   } catch (...) {
@@ -251,7 +243,7 @@ char* sjef_project_filename(const char* project) {
   try {
     if (projects.count(project) == 0)
       sjef_project_open(project);
-    return strdup(projects.at(project)->filename().c_str());
+    return strdup(projects.at(project)->filename().string().c_str());
   } catch (std::exception& e) {
     error(e);
   } catch (...) {
@@ -443,7 +435,7 @@ char* sjef_project_recent(int number, const char* suffix) {
 }
 char* sjef_expand_path(const char* path, const char* default_suffix) {
   try {
-    return strdup(sjef::expand_path(std::string{path}, std::string{default_suffix}).c_str());
+    return strdup(sjef::expand_path(path, default_suffix).string().c_str());
   } catch (std::exception& e) {
     error(e);
   } catch (...) {
@@ -454,7 +446,7 @@ char* sjef_project_filename_general(const char* project, const char* suffix, con
   try {
     if (projects.count(project) == 0)
       sjef_project_open(project);
-    return strdup(projects.at(project)->filename(suffix, name, run).c_str());
+    return strdup(projects.at(project)->filename(suffix, name, run).string().c_str());
   } catch (std::exception& e) {
     error(e);
   } catch (...) {
@@ -466,7 +458,7 @@ char* sjef_project_run_directory(const char* project, int run) {
   try {
     if (projects.count(project) == 0)
       sjef_project_open(project);
-    return strdup(projects.at(project)->run_directory(run).c_str());
+    return strdup(projects.at(project)->run_directory(run).string().c_str());
   } catch (std::exception& e) {
     error(e);
   } catch (...) {
@@ -550,5 +542,17 @@ unsigned int sjef_project_current_run(const char* project) {
   } catch (...) {
   }
   return 0;
+}
+
+const char* sjef_project_backend_cache(const char* project) {
+  try {
+    if (projects.count(project) == 0)
+      sjef_project_open(project);
+    return strdup(projects.at(project)->backend_cache().c_str());
+  } catch (std::exception& e) {
+    error(e);
+  } catch (...) {
+  }
+  return nullptr;
 }
 }

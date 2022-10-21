@@ -15,10 +15,9 @@ namespace fs = std::filesystem;
 
 
 
-TEST(project, c_binding) {
-  savestate x;
-  const char* projectname = strdup(x.testproject("cproject").c_str());
-  const char* projectname2 = strdup(x.testproject("cproject2").c_str());
+TEST_F(test_sjef, c_binding) {
+  const char* projectname = strdup(testproject("cproject").string().c_str());
+  const char* projectname2 = strdup(testproject("cproject2").string().c_str());
   //  sjef_project_erase(projectname);
   //  sjef_project_erase(projectname2);
   char key[] = "testkey";
@@ -42,7 +41,9 @@ TEST(project, c_binding) {
   ASSERT_EQ(std::string{}, std::string{sjef_project_property_get(projectname, key)});
   ASSERT_EQ(std::string{}, std::string{sjef_project_property_get(projectname, "unknown key")});
   sjef_project_property_set(projectname, key, value);
-  sjef_project_copy(projectname, projectname2, 0);
+  ASSERT_NE(sjef_project_backend_cache(projectname),nullptr);
+  EXPECT_NE(std::string{sjef_project_backend_cache(projectname)},"");
+  sjef_project_copy(projectname, projectname2, 0, 0);
   //  std::cout << "after copy, from="<<projectname<<std::endl;
   //  if (system((std::string{"ls -ltraR "} + projectname).c_str())) { }
   //  if (system((std::string{"cat "} + projectname+"/Info.plist").c_str())) {}
@@ -81,22 +82,20 @@ TEST(backend, C_keys) {
   EXPECT_EQ(i, 9);
   free(allKeys);
 }
-TEST(project, C_quick_destroy) {
-  savestate state;
-  const char* projname = strdup(state.testproject("C_project").c_str());
+TEST_F(test_sjef, C_quick_destroy) {
+  const char* projname = strdup(testproject("C_project").string().c_str());
   sjef_project_open(projname);
   sjef_project_close(projname);
 }
 
-TEST(backend, C_values) { // TODO actually implement some of this for C
-  savestate state;
-  const char* projname = strdup(state.testproject("C_project").c_str());
+TEST_F(test_sjef, C_values) { // TODO actually implement some of this for C
+  const char* projname = strdup(testproject("C_project").string().c_str());
   fs::remove_all(projname);
   sjef_project_open(projname);
   EXPECT_THROW(sjef_backend_value(projname, "!*@£junk", "name"), std::runtime_error);
   sjef_project_close(projname);
-  EXPECT_THAT(std::string{sjef_project_recent(1, state.suffix().c_str())}, ::testing::HasSubstr(std::string{"C_project."}+state.suffix()));
-  EXPECT_EQ(sjef_project_recent_find(sjef_project_recent(1, state.suffix().c_str())), 1);
+  EXPECT_THAT(std::string{sjef_project_recent(1, suffix().c_str())}, ::testing::HasSubstr(std::string{"C_project."}+suffix()));
+  EXPECT_EQ(sjef_project_recent_find(sjef_project_recent(1, suffix().c_str())), 1);
   auto allBackends = sjef_project_backend_names(projname);
   //  std::cerr << "back from making allBackends"<<std::endl;
   // char** allBackends = NULL;

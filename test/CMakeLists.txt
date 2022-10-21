@@ -11,12 +11,20 @@ if (NOT googletest_POPULATED)
 endif ()
 
 file(COPY He.molpro DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-find_program(MOLPRO molpro
-        HINTS "C:\\Program Files\\Molpro\\bin\\molpro.bat"
-        )
+if (WIN32)
+#    find_program(MOLPRO molpro.bat)
+    find_program(MOLPRO molpro
+            HINTS "C:\\Program Files\\Molpro\\bin\\molpro.bat"
+            )
+else ()
+    find_program(MOLPRO molpro)
+endif ()
+if (NOT MOLPRO STREQUAL MOLPRO-NOTFOUND)
+    message(STATUS "Molpro included in tests")
+endif ()
 
 include(GoogleTest)
-foreach (t test-sjef test-sjef-c test-Locker test-sjef-molpro)
+foreach (t test-sjef test-sjef-c test-Locker test-sjef-molpro test-Command)
     if (NOT (MOLPRO STREQUAL MOLPRO-NOTFOUND AND t STREQUAL test-sjef-molpro))
         add_executable(${t} ${t}.cpp test-sjef.h)
         target_compile_definitions(${t} PRIVATE SJEF_VERSION=\"${SJEF_VERSION}\")
@@ -27,6 +35,7 @@ foreach (t test-sjef test-sjef-c test-Locker test-sjef-molpro)
         endif ()
     endif ()
 endforeach ()
+set_property(TARGET test-Command PROPERTY CXX_STANDARD 17)
 
 foreach (t test-c-sjef-backend)
     add_executable(${t} ${t}.c)
@@ -39,6 +48,11 @@ if (NOT MOLPRO STREQUAL MOLPRO-NOTFOUND)
     endif ()
     target_link_libraries(test-sjef-molpro PRIVATE Boost::headers)
 endif ()
+
+if (NOT TARGET Boost::process)
+    find_package(Boost 1.71.0 REQUIRED)
+endif ()
+target_link_libraries(test-Locker PRIVATE Boost::headers)
 
 add_executable(logger logger.cpp)
 target_link_libraries(logger PRIVATE ${LIB_NAME})
