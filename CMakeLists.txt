@@ -58,23 +58,30 @@ add_custom_target(_version.py
 )
 
 if (WIN32)
-    set(libxxhash_tar libxxhash-0.8.0-1-x86_64.pkg.tar.zst)
-    FetchContent_Declare(libxxhash
-            URL http://repo.msys2.org/msys/x86_64/${libxxhash_tar}
-    )
-    set(rsync_tar rsync-3.2.7-2-x86_64.pkg.tar.zst)
-    FetchContent_Declare(rsync
-            URL http://repo.msys2.org/msys/x86_64/${rsync_tar}
-    )
-    FetchContent_MakeAvailable(libxxhash)
-    FetchContent_MakeAvailable(rsync)
-    foreach (tar ${libxxhash_tar};${rsync_tar})
-        execute_process(
-                COMMAND ${CMAKE_COMMAND} -E tar -I zstd -C ${CMAKE_CURRENT_BINARY_DIR} -xf ${tar}
-        )
-    endforeach ()
-    #    install(DIRECTORY ${cwrsync_SOURCE_DIR}/ DESTINATION etc/cwrsync PATTERN .git EXCLUDE)
+    if (CONDA_PROVIDES_RSYNC)
+    else ()
+        FetchContent_Declare(m2 URL https://repo.msys2.org/msys/x86_64/msys2-runtime-3.3-3.3.6-2-x86_64.pkg.tar.zst )
+        FetchContent_Declare(bash URL http://repo.msys2.org/msys/x86_64/bash-5.2.026-1-x86_64.pkg.tar.zst )
+        FetchContent_Declare(libxxhash URL http://repo.msys2.org/msys/x86_64/libxxhash-0.8.1-1-x86_64.pkg.tar.zst )
+        FetchContent_Declare(rsync URL http://repo.msys2.org/msys/x86_64/rsync-3.2.7-2-x86_64.pkg.tar.zst)
+        FetchContent_Declare(libzstd URL http://repo.msys2.org/msys/x86_64/libzstd-1.5.5-1-x86_64.pkg.tar.zst )
+        FetchContent_Declare(liblz4 URL http://repo.msys2.org/msys/x86_64/liblz4-1.9.4-1-x86_64.pkg.tar.zst )
+        FetchContent_Declare(libopenssl URL https://repo.msys2.org/msys/x86_64/libopenssl-3.1.1-1-x86_64.pkg.tar.zst )
+        FetchContent_Declare(libiconv URL https://repo.msys2.org/msys/x86_64/libiconv-1.17-1-x86_64.pkg.tar.zst )
+        FetchContent_Declare(openssh URL https://repo.msys2.org/msys/x86_64/openssh-9.6p1-1-x86_64.pkg.tar.zst )
+        FetchContent_Declare(zlib URL https://repo.msys2.org/msys/x86_64/zlib-1.3.1-1-x86_64.pkg.tar.zst )
+#        FetchContent_Declare(git URL https://repo.msys2.org/msys/x86_64/git-2.44.0-1-x86_64.pkg.tar.zst )
+#        FetchContent_Declare(gss URL https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-gss-1.0.4-1-any.pkg.tar.zst )
+        foreach(c bash rsync m2 libzstd libxxhash liblz4 libopenssl libiconv)# openssh zlib)
+            FetchContent_MakeAvailable(${c})
+            install(DIRECTORY ${${c}_SOURCE_DIR}/usr/bin DESTINATION .)
+        endforeach ()
+#        foreach(c gss)
+#            FetchContent_MakeAvailable(${c})
+#            install(DIRECTORY ${${c}_SOURCE_DIR}/mingw64/bin DESTINATION .)
+#        endforeach ()
+    endif ()
 
-    file(WRITE usr/bin/rsync "export MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL=\"*\"\nexec rsync.exe --rsh=\"/usr/bin/ssh -o UserKnownHostsFile=$HOMEPATH/.ssh/known_hosts -F $HOMEPATH/.ssh/config -i $HOMEPATH/.ssh/id_rsa -i $HOMEPATH/.ssh/id_dsa -i $HOMEPATH/.ssh/id_ed25519 -i $HOMEPATH/.ssh/id_ed25519_sk -i $HOMEPATH/.ssh/id_ecdsa -i $HOMEPATH/.ssh/id_ecdsa_sk\" \"$@\"")
-    install(DIRECTORY usr DESTINATION Library)
+    file(WRITE usr/bin/rsync "export MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL=\"*\"\nrsync.exe --rsh=\"/usr/bin/ssh -o UserKnownHostsFile=$HOMEPATH/.ssh/known_hosts -F $HOMEPATH/.ssh/config -i $HOMEPATH/.ssh/id_rsa -i $HOMEPATH/.ssh/id_dsa -i $HOMEPATH/.ssh/id_ed25519 -i $HOMEPATH/.ssh/id_ed25519_sk -i $HOMEPATH/.ssh/id_ecdsa -i $HOMEPATH/.ssh/id_ecdsa_sk\" \"$@\"")
+    install(DIRECTORY usr/bin DESTINATION .)
 endif ()
