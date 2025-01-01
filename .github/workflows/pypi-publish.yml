@@ -4,6 +4,8 @@ on:
 #  release:
 #    types: [created]
   push:
+env:
+  PREFIX: /tmp
 jobs:
   pypi-publish:
     name: Publish release to PyPI
@@ -11,7 +13,6 @@ jobs:
     environment:
       name: testpypi
       url: https://test.pypi.org/p/pysjef
-      PREFIX: /tmp
     permissions:
       id-token: write
     steps:
