@@ -15,16 +15,21 @@ jobs:
       url: https://test.pypi.org/p/pysjef
     permissions:
       id-token: write
+      contents: read
+      packages: write
+    container:
+      # relies on repository name being all lower case
+      image: ghcr.io/${{ github.repository }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
-      - name: Set up build tools
-        run: |
-          apt update
-          apt install -y cmake gcc
       - name: Build sjef
         run: |
           cmake -B cmake-build -S . -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_TESTS=OFF -DBUILD_PROGRAM=OFF
