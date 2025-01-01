@@ -34,7 +34,7 @@ jobs:
         run: |
           cmake -B cmake-build -S . -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_TESTS=OFF -DBUILD_PROGRAM=OFF
           cmake --build cmake-build -t install
-          grep CMAKE_PROJECT_VERSION: cmake-build/CMakeCache.txt | sed -e 's/.*=/__version__ = "/' -e 's/$/"/' > pysjef/_version.py
+          grep CMAKE_PROJECT_VERSION: cmake-build/CMakeCache.txt | sed -e 's/.*=/__version__ = "/' -e 's/$/"/' > pysjef/pysjef/_version.py
       - name: Install dependencies
         run: |
           python -m venv /tmp/venv
