@@ -11,6 +11,7 @@ jobs:
     environment:
       name: testpypi
       url: https://test.pypi.org/p/pysjef
+      PREFIX: /tmp
     permissions:
       id-token: write
     steps:
