@@ -32,7 +32,7 @@ jobs:
           python-version: "3.x"
       - name: Build sjef
         run: |
-          cmake -B cmake-build -S . -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_TESTS=OFF -DBUILD_PROGRAM=OFF
+          cmake -B cmake-build -S . -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_TESTS=OFF -DBUILD_PROGRAM=OFF -DCMAKE_CXX_FLAGS=-fPIC
           cmake --build cmake-build -t install
           grep CMAKE_PROJECT_VERSION: cmake-build/CMakeCache.txt | sed -e 's/.*=/__version__ = "/' -e 's/$/"/' > pysjef/pysjef/_version.py
       - name: Install dependencies
