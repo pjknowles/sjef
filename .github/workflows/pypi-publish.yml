@@ -37,11 +37,14 @@ jobs:
           grep CMAKE_PROJECT_VERSION: cmake-build/CMakeCache.txt | sed -e 's/.*=/__version__ = "/' -e 's/$/"/' > pysjef/_version.py
       - name: Install dependencies
         run: |
+          python -m venv /tmp/venv
+          PATH=/tmp/venv/bin:$PATH
           python -m pip install --upgrade pip
           pip install setuptools wheel cython
       - name: Build package
         run: |
           cd pysjef
+          PATH=/tmp/venv/bin:$PATH
           python setup.py sdist bdist_wheel  # Could also be python -m build
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
