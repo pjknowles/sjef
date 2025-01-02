@@ -57,6 +57,8 @@ jobs:
       - name: Build package
         run: |
           PATH=/tmp/venv/bin:$PATH
-          python pysjef/setup.py sdist bdist_wheel # Could also be python -m build
+          cd pysjef
+          python setup.py sdist bdist_wheel # Could also be python -m build
+          mv dist ..
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
