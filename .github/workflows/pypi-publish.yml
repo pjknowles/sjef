@@ -56,8 +56,7 @@ jobs:
           pip install setuptools wheel cython
       - name: Build package
         run: |
-          cd pysjef
           PATH=/tmp/venv/bin:$PATH
-          python setup.py --dist-dir=../dist sdist bdist_wheel # Could also be python -m build
+          python pysjef/setup.py sdist bdist_wheel # Could also be python -m build
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
