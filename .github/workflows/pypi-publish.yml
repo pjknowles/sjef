@@ -38,7 +38,7 @@ jobs:
           auto-update-conda: true
           python-version: "3.13"
       - name: Install conda packages
-        run: conda install -y -c conda-forge cmake c-compiler cxx-compiler
+        run: conda install -y -c conda-forge cmake c-compiler cxx-compiler numpy boost-cpp cython regex make
       - name: Conda info
         run: |
           conda info
