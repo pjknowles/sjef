@@ -15,8 +15,8 @@ jobs:
       url: https://test.pypi.org/p/pysjef
     permissions:
       id-token: write
-      contents: read
-      packages: write
+#      contents: read
+#      packages: write
 #    container:
 #      image: ghcr.io/${{ github.repository }}
 #      credentials:
@@ -37,8 +37,8 @@ jobs:
         with:
           auto-update-conda: true
           python-version: "3.13"
-      - name: Install conda packages
-        run: conda install -y -c conda-forge cmake c-compiler cxx-compiler numpy boost-cpp cython regex make
+      - name: Install conda packages for C++ build
+        run: conda install -y -c conda-forge cmake c-compiler cxx-compiler boost-cpp cython
       - name: Conda info
         run: |
           conda info
@@ -58,6 +58,7 @@ jobs:
         run: |
           cd pysjef
           PATH=/tmp/venv/bin:$PATH
-          python setup.py sdist bdist_wheel  # Could also be python -m build
+#          python setup.py sdist bdist_wheel  # Could also be python -m build
+          python -m build --dist-dir=../dist
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
