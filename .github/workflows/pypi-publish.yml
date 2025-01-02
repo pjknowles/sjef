@@ -33,7 +33,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
-          python-version: "3.x"
+          python-version: "3.13"
       - name: Conda info
         shell: bash -el {0}
         run: |
